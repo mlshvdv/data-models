@@ -22,7 +22,7 @@ class DataCollection implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @inheritDoc
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->items[$offset]);
     }
@@ -30,7 +30,7 @@ class DataCollection implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @inheritDoc
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->items[$offset];
     }
@@ -38,7 +38,7 @@ class DataCollection implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @inheritDoc
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (is_null($offset)) {
             $this->items[] = $value;
@@ -50,7 +50,7 @@ class DataCollection implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @inheritDoc
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->items[$offset]);
     }
@@ -66,7 +66,7 @@ class DataCollection implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         return array_map(function ($item) {
             if ($item instanceof DataModel) {
@@ -93,7 +93,7 @@ class DataCollection implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->items);
     }
@@ -101,7 +101,7 @@ class DataCollection implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->items);
     }
@@ -114,7 +114,7 @@ class DataCollection implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return mixed
      */
-    public function first(callable $callback = null, $default = null)
+    public function first(callable $callback = null, $default = null): mixed
     {
         if (is_null($callback)) {
             $callback = function ($item) {
@@ -134,7 +134,7 @@ class DataCollection implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * @inheritDoc
      */
-    public function filter(callable $callback)
+    public function filter(callable $callback): array
     {
         return array_filter($this->items, $callback);
     }
