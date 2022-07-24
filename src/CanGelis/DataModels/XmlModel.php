@@ -5,6 +5,14 @@ namespace CanGelis\DataModels;
 class XmlModel extends DataModel
 {
     /**
+     * Wrap root node with additional one when
+     * current root node as a list of items
+     *
+     * @var
+     */
+    public const IS_ROOT_LIST = false;
+
+    /**
      * @var \SimpleXMLElement $data
      */
     protected $data;
@@ -40,6 +48,16 @@ class XmlModel extends DataModel
     }
 
     /**
+     * Return current model root node
+     *
+     * @return string
+     */
+    public function getRoot(): string
+    {
+        return $this->root;
+    }
+
+    /**
      * Initialize from XML string
      *
      * @param string $data
@@ -49,7 +67,13 @@ class XmlModel extends DataModel
      */
     public static function fromString($data, $root = null)
     {
-        return new static(simplexml_load_string($data), $root);
+        if (static::IS_ROOT_LIST === true) {
+            $re = '/^<\?xml(.*)\?>(.\X*)/m';
+            $subst = '<?xml$1?><root>$2</root>';
+            $data = preg_replace($re, $subst, trim($data));
+        }
+
+        return new static(simplexml_load_string($data), static::IS_ROOT_LIST ? 'root' : $root);
     }
 
     /**
@@ -178,10 +202,12 @@ class XmlModel extends DataModel
         $items = [];
 
         if (isset($this->data->{$relation})) {
+            $relationModel = new $this->hasMany[$relation](null);
             foreach ($this->data->{$relation}->children() as $child) {
-                $items[] = new $this->hasMany[$relation]($child, $child->getName());
+                if (is_null($relationModel->getRoot()) || $relationModel->getRoot() === $child->getName()) {
+                    $items[] = new $this->hasMany[$relation]($child, $child->getName());
+                }
             }
-
             unset($this->data->{$relation});
         }
 
